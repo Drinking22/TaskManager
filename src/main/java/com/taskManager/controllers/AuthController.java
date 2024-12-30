@@ -1,8 +1,6 @@
 package com.taskManager.controllers;
 
 import com.taskManager.entity.UserEntity;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,7 +10,7 @@ import java.util.Collection;
 
 @RestController
 @RequestMapping("/user")
-public class UserController {
+public class AuthController {
 
     @GetMapping("/{id}")
     public UserEntity getUser(@RequestParam Long id) {
@@ -20,7 +18,7 @@ public class UserController {
         return null;
     }
 
-    @GetMapping("/users")
+    @GetMapping()
     public Collection<UserEntity> getAllUsers() {
 
         return java.util.List.of();

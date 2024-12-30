@@ -1,5 +1,6 @@
 package com.taskManager.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taskManager.entity.TaskEntity;
 import com.taskManager.entity.UserEntity;
 import com.taskManager.entity.UserRole;
@@ -14,8 +15,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(TaskController.class)
@@ -28,11 +33,13 @@ class TaskControllerTest {
     @MockitoBean
     private TaskServiceImpl service;
 
+    private ObjectMapper mapper;
     private UserEntity user;
     private TaskEntity task;
 
     @BeforeEach
     void setUp() {
+        mapper = new ObjectMapper();
         user = new UserEntity(
                 1L, "John", "Doe", "example@test.com", "examplePassword", null, UserRole.ADMIN);
         task = new TaskEntity(1L, user, "Test task", "Test description");
@@ -43,8 +50,9 @@ class TaskControllerTest {
         when(service.getTaskById(ID)).thenReturn(task);
 
         mock.perform(MockMvcRequestBuilders.get("/task/{id}", ID)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$.id").value(task.getId()))
                 .andExpect(jsonPath("$.title").value(task.getTitle()))
                 .andExpect(jsonPath("$.description").value(task.getDescription()));
@@ -55,24 +63,76 @@ class TaskControllerTest {
         when(service.getTaskById(ID)).thenThrow(new TaskNotFoundException("Task with id: " + ID + " not found"));
 
         mock.perform(MockMvcRequestBuilders.get("/task/{id}", ID)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.message").value("Task with id: " + ID + " not found"));
     }
 
     @Test
-    void getAllTasks() {
+    void whenGetAllTasks_thenReturnListOfTasks() throws Exception {
+        List<TaskEntity> taskList = List.of(
+                new TaskEntity(1L, user, "Test title id 1", "Test description id 1"),
+                new TaskEntity(2L, user, "Test title id 2", "Test description id 2")
+        );
+
+        when(service.getAllTasks()).thenReturn(taskList);
+
+        mock.perform(MockMvcRequestBuilders.get("/task")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].title", is("Test title id 1")))
+                .andExpect(jsonPath("$[0].description", is("Test description id 1")))
+                .andExpect(jsonPath("$[1].id", is(2)))
+                .andExpect(jsonPath("$[1].title", is("Test title id 2")))
+                .andExpect(jsonPath("$[1].description", is("Test description id 2")));
     }
 
     @Test
-    void createTask() {
+    void whenCreateTask_thenReturnNewTask() throws Exception {
+        TaskEntity newTask =
+                new TaskEntity(ID, user, "New test title", "New test description");
+
+        when(service.createTask(any(TaskEntity.class))).thenReturn(newTask);
+
+        mock.perform(MockMvcRequestBuilders.post("/task")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(newTask)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(newTask.getId()))
+                .andExpect(jsonPath("$.title").value(newTask.getTitle()))
+                .andExpect(jsonPath("$.description").value(newTask.getDescription()))
+                .andExpect(jsonPath("$.user_id.id").value(newTask.getUser().getId()));
     }
 
     @Test
-    void updateTask() {
+    void whenUpdateTask_thenReturnUpdatedTask() throws Exception {
+        TaskEntity updateTask =
+                new TaskEntity(ID, user, "Update title", "Update description");
+
+        when(service.updateTask(any(TaskEntity.class))).thenReturn(updateTask);
+
+        mock.perform(MockMvcRequestBuilders.put("/task")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(updateTask)))
+                .andDo(print())
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(updateTask.getId()))
+                .andExpect(jsonPath("$.title").value(updateTask.getTitle()))
+                .andExpect(jsonPath("$.description").value(updateTask.getDescription()))
+                .andExpect(jsonPath("$.user_id.id").value(updateTask.getUser().getId()));
     }
 
     @Test
-    void deleteTask() {
+    void whenDeleteTask_thenGetStatusNoContent() throws Exception {
+        doNothing().when(service).deleteTaskById(ID);
+
+        mock.perform(MockMvcRequestBuilders.delete("/task/{id}", ID))
+                .andDo(print())
+                .andExpect(status().isNoContent());
     }
 }

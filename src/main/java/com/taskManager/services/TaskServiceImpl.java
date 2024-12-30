@@ -1,7 +1,6 @@
 package com.taskManager.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.taskManager.utils.BaseLoggerService;
 import com.taskManager.entity.TaskEntity;
 import com.taskManager.exceptions.TaskNotFoundException;
 import com.taskManager.repository.TaskRepository;
@@ -11,8 +10,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class TaskServiceImpl implements TaskService {
-    private static final Logger logger = LoggerFactory.getLogger(TaskServiceImpl.class);
+public class TaskServiceImpl extends BaseLoggerService implements TaskService {
 
     private final TaskRepository repository;
 
@@ -49,7 +47,7 @@ public class TaskServiceImpl implements TaskService {
             updateTask.setTitle(task.getTitle());
             updateTask.setDescription(task.getDescription());
 
-            logger.info("Update task: {}", updateTask);
+            logger.info("Update task with id: {}", updateTask.getId());
             return repository.save(updateTask);
         } else {
             logger.info("Task with id: {} not found, creating new task", task.getId());
