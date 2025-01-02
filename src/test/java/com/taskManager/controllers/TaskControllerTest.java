@@ -5,7 +5,7 @@ import com.taskManager.entity.TaskEntity;
 import com.taskManager.entity.UserEntity;
 import com.taskManager.entity.UserRole;
 import com.taskManager.exceptions.TaskNotFoundException;
-import com.taskManager.services.TaskServiceImpl;
+import com.taskManager.services.task.TaskServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

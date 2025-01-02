@@ -1,4 +1,4 @@
-package com.taskManager.services;
+package com.taskManager.services.task;
 
 import com.taskManager.entity.TaskEntity;
 

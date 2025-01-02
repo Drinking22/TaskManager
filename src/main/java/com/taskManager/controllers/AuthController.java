@@ -1,28 +1,30 @@
 package com.taskManager.controllers;
 
+import com.taskManager.dto.UserRegistrationDto;
 import com.taskManager.entity.UserEntity;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.taskManager.services.user.UserService;
+import com.taskManager.utils.BaseLoggerService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
-
 @RestController
-@RequestMapping("/user")
-public class AuthController {
+@RequestMapping("/authentication")
+public class AuthController extends BaseLoggerService {
 
-    @GetMapping("/{id}")
-    public UserEntity getUser(@RequestParam Long id) {
+    private UserService service;
 
-        return null;
+    public AuthController(UserService service) {
+        this.service = service;
     }
 
-    @GetMapping()
-    public Collection<UserEntity> getAllUsers() {
-
-        return java.util.List.of();
+    @PostMapping("/registration")
+    public ResponseEntity<UserEntity> registerUser(@Validated @RequestBody UserRegistrationDto userDto) {
+        logger.info("Registering user with e-mail: {}", userDto.getEmail());
+        UserEntity registerUser = service.registerUser(userDto);
+        return ResponseEntity.ok(registerUser);
     }
-
-
 }
