@@ -1,11 +1,10 @@
-package com.taskManager.services;
+package com.taskManager.services.task;
 
 import com.taskManager.entity.TaskEntity;
 import com.taskManager.entity.UserEntity;
 import com.taskManager.entity.UserRole;
 import com.taskManager.exceptions.TaskNotFoundException;
 import com.taskManager.repository.TaskRepository;
-import com.taskManager.services.task.TaskServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

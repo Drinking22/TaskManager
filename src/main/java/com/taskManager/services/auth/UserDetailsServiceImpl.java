@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 
+/**
+ * Реализация сервиса для загрузки данных пользователя по имени пользователя (в данном случае - по email).
+ * Этот класс использует репозиторий пользователей для получения информации о пользователе.
+ */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
@@ -18,6 +22,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.repository = repository;
     }
 
+    /**
+     * Загружает пользователя по указанному email.
+     *
+     * @param email - адрес электронной почты пользователя
+     * @return UserDetails - объект, содержащий информацию о пользователе
+     * @throws UsernameNotFoundException если пользователь с указанным email не найден
+     */
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity user = repository.findByEmail(email).orElseThrow(() ->
