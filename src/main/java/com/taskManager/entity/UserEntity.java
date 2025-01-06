@@ -33,11 +33,10 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<TaskEntity> tasks;
 
-    @Enumerated(value = EnumType.STRING)
-    @Column(columnDefinition = "enum('ADMIN', 'USER')", nullable = false)
-    private UserRole role;
+    @Column(nullable = false)
+    private String role;
 
-    public UserEntity(Long id, String firstName, String lastName, String email, String password, List<TaskEntity> tasks, UserRole role) {
+    public UserEntity(Long id, String firstName, String lastName, String email, String password, List<TaskEntity> tasks, String role) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -98,11 +97,11 @@ public class UserEntity {
         this.tasks = tasks;
     }
 
-    public UserRole getRole() {
+    public String getRole() {
         return role;
     }
 
-    public void setRole(UserRole role) {
+    public void setRole(String role) {
         this.role = role;
     }
 }

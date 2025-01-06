@@ -18,6 +18,17 @@ public class UserRegistrationDto {
     @NotBlank
     private String password;
 
+    @NotBlank
+    private String role;
+
+    public @NotBlank String getRole() {
+        return role;
+    }
+
+    public void setRole(@NotBlank String role) {
+        this.role = role;
+    }
+
     public @NotBlank String getFirstName() {
         return firstName;
     }

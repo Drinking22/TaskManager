@@ -2,7 +2,6 @@ package com.taskManager.services.user;
 
 import com.taskManager.dto.UserRegistrationDto;
 import com.taskManager.entity.UserEntity;
-import com.taskManager.entity.UserRole;
 import com.taskManager.repository.UserRepository;
 import com.taskManager.utils.BaseLoggerService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,7 +33,7 @@ public class UserServiceImpl extends BaseLoggerService implements UserService {
         saveUser.setLastName(userDto.getLastName());
         saveUser.setEmail(userDto.getEmail());
         saveUser.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        saveUser.setRole(UserRole.USER);
+        saveUser.setRole(userDto.getRole());
         return saveUser;
     }
 }

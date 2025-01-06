@@ -2,7 +2,6 @@ package com.taskManager.services.task;
 
 import com.taskManager.entity.TaskEntity;
 import com.taskManager.entity.UserEntity;
-import com.taskManager.entity.UserRole;
 import com.taskManager.exceptions.TaskNotFoundException;
 import com.taskManager.repository.TaskRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +33,7 @@ class TaskServiceImplTest {
     @BeforeEach
     void setUp() {
         user = new UserEntity(
-                1L, "John", "Doe", "example@test.com", "examplePassword", null, UserRole.ADMIN);
+                1L, "John", "Doe", "example@test.com", "examplePassword", null, "ADMIN");
         task = new TaskEntity(1L, user, "Test task", "Test description");
     }
 
