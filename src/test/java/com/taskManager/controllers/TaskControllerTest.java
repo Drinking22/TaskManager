@@ -3,7 +3,6 @@ package com.taskManager.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taskManager.entity.TaskEntity;
 import com.taskManager.entity.UserEntity;
-import com.taskManager.entity.UserRole;
 import com.taskManager.exceptions.TaskNotFoundException;
 import com.taskManager.services.task.TaskServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -41,11 +42,12 @@ class TaskControllerTest {
     void setUp() {
         mapper = new ObjectMapper();
         user = new UserEntity(
-                1L, "John", "Doe", "example@test.com", "examplePassword", null, UserRole.ADMIN);
+                1L, "John", "Doe", "example@test.com", "examplePassword", null, "ADMIN");
         task = new TaskEntity(1L, user, "Test task", "Test description");
     }
 
     @Test
+    @WithMockUser(roles = {"USER", "ADMIN"})
     void whenGetTaskId_thenReturnTask() throws Exception {
         when(service.getTaskById(ID)).thenReturn(task);
 
@@ -59,6 +61,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"USER", "ADMIN"})
     void whenGetTaskById_thenThrowException() throws Exception {
         when(service.getTaskById(ID)).thenThrow(new TaskNotFoundException("Task with id: " + ID + " not found"));
 
@@ -70,6 +73,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = {"USER", "ADMIN"})
     void whenGetAllTasks_thenReturnListOfTasks() throws Exception {
         List<TaskEntity> taskList = List.of(
                 new TaskEntity(1L, user, "Test title id 1", "Test description id 1"),
@@ -92,6 +96,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void whenCreateTask_thenReturnNewTask() throws Exception {
         TaskEntity newTask =
                 new TaskEntity(ID, user, "New test title", "New test description");
@@ -99,6 +104,7 @@ class TaskControllerTest {
         when(service.createTask(any(TaskEntity.class))).thenReturn(newTask);
 
         mock.perform(MockMvcRequestBuilders.post("/task")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(newTask)))
                 .andDo(print())
@@ -110,6 +116,7 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void whenUpdateTask_thenReturnUpdatedTask() throws Exception {
         TaskEntity updateTask =
                 new TaskEntity(ID, user, "Update title", "Update description");
@@ -117,6 +124,7 @@ class TaskControllerTest {
         when(service.updateTask(any(TaskEntity.class))).thenReturn(updateTask);
 
         mock.perform(MockMvcRequestBuilders.put("/task")
+                        .with(SecurityMockMvcRequestPostProcessors.csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(updateTask)))
                 .andDo(print())
@@ -128,10 +136,12 @@ class TaskControllerTest {
     }
 
     @Test
+    @WithMockUser(roles = "ADMIN")
     void whenDeleteTask_thenGetStatusNoContent() throws Exception {
         doNothing().when(service).deleteTaskById(ID);
 
-        mock.perform(MockMvcRequestBuilders.delete("/task/{id}", ID))
+        mock.perform(MockMvcRequestBuilders.delete("/task/{id}", ID)
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
                 .andDo(print())
                 .andExpect(status().isNoContent());
     }

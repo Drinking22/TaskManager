@@ -21,14 +21,14 @@ public class TaskController extends BaseLoggerService {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public TaskEntity getTask(@PathVariable Long id) {
         logger.info("Try to get task with id: {}", id);
         return service.getTaskById(id);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     public List<TaskEntity> getAllTasks() {
         logger.info("Get all tasks");
         return service.getAllTasks();
