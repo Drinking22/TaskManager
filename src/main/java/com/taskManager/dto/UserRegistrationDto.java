@@ -21,6 +21,14 @@ public class UserRegistrationDto {
     @NotBlank
     private String role;
 
+    public UserRegistrationDto(String firstName, String lastName, String email, String password, String role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
     public @NotBlank String getRole() {
         return role;
     }

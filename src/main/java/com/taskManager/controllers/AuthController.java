@@ -7,6 +7,8 @@ import com.taskManager.services.auth.UserDetailsServiceImpl;
 import com.taskManager.services.user.UserService;
 import com.taskManager.utils.BaseLoggerService;
 import com.taskManager.utils.JwtUtil;
+import jakarta.annotation.security.PermitAll;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +37,7 @@ public class AuthController extends BaseLoggerService {
     }
 
     @PostMapping("/registration")
+    @PermitAll
     public ResponseEntity<UserEntity> registerUser(@Validated @RequestBody UserRegistrationDto userDto) {
         logger.info("Registering user with e-mail: {}", userDto.getEmail());
         UserEntity registerUser = service.registerUser(userDto);
@@ -42,14 +45,19 @@ public class AuthController extends BaseLoggerService {
     }
 
     @PostMapping("/login")
+    @PermitAll
     public ResponseEntity<String> loginUser(@RequestBody UserLoginDto userDto) {
         logger.info("Login user with e-mail: {}", userDto.getEmail());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userDto.getEmail(), userDto.getPassword())
         );
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.getEmail());
-        String jwt = jwtUtil.generateToken(userDetails.getUsername());
-        return ResponseEntity.ok(jwt);
+        if (authentication.isAuthenticated()) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userDto.getEmail());
+            String jwt = jwtUtil.generateToken(userDetails.getUsername());
+            return ResponseEntity.ok(jwt);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Authentication failed");
+        }
     }
 }

@@ -12,6 +12,11 @@ public class UserLoginDto {
     @NotBlank
     private String password;
 
+    public UserLoginDto(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
+
     public @Email(message = "Please enter a valid e-mail address") @NotBlank String getEmail() {
         return email;
     }
